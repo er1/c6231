@@ -1,3 +1,9 @@
+# no hidden files
+.*
+
+# no binaries
+bin
+
 *.class
 
 # Package Files #

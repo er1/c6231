@@ -1,0 +1,19 @@
+string createCRecord(in string badgeId, in string firstName, in string lastName, in string description, in string status);
+
+	createCRecord:SPVM1234:John:Doe:Description Here:OnTheRun
+
+string createMRecord(in string badgeId, in string firstName, in string lastName, in string address, in long long lastDate, in string lastLocation, in string status);
+
+	createMRecord:SPL4321:Ellie:Johnson:123 Fake St.:1022780000:Montreal:Missing
+
+string getRecordCount(in string badgeId);
+
+	getRecordCount:SPB7777
+
+string editCRecord(in string badgeId, in string lastName, in string recordID, in string status);
+
+	editCRecord:SPL4545:John:CR10001:OnTheRun
+
+string transferRecord(in string badgeID, in string recordID, in string remoteStationServerName);
+
+	transferRecord:SPVM7851:CR10000:SPL

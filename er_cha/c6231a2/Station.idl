@@ -1,0 +1,12 @@
+module c6231
+{
+	interface StationInterface
+	{
+		string createCRecord(in string firstName, in string lastName, in string description, in string status);
+		string createMRecord(in string firstName, in string lastName, in string address, in string lastDate, in string lastLocation, in string status);
+		string getRecordCounts();
+		string editCRecord(in string lastName, in string recordID, in string newStatus);
+		string transferRecord(in string badgeID, in string recordID, in string remoteStationServerName);
+	};
+};
+

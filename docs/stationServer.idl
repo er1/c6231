@@ -1,0 +1,24 @@
+module stationServerIDL {
+
+	interface StationInterface{
+	
+		// returns: a record ID on success, empty string on fail
+		string createCRecord(in string badgeId, in string firstName, in string lastName, in string description, in string status);
+		
+		// returns: a record ID on success, empty string on fail
+		// lastDate comes from Date.getTime();
+		// can be created from new Date(long lastDate)
+		string createMRecord(in string badgeId, in string firstName, in string lastName, in string address, in long long lastDate, in string lastLocation, in string status);
+		// returns: a string formatted as station:count;station:count;station:count;station:count;...
+		// using negative count as a fail
+		// (i.e. SPVM:5;SPL:3;SPB:-1)
+		string getRecordCount(in string badgeId);
+	
+		// returns: a record ID on success, empty string on fail
+		string editCRecord(in string badgeId, in string lastName, in string recordID, in string status);
+	
+		// returns the new record ID on the destination server on success, empty string on fail
+		string transferRecord(in string badgeID, in string recordID, in string remoteStationServerName);
+		
+	};
+};

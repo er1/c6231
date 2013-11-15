@@ -1,0 +1,37 @@
+<h1>COMP 6231</h1>
+
+<p>Eric Chan (9365079)</p>
+
+<h2>Distributed Police Information System</h2>
+
+<p>In this project we were asked to produce a distributed police information system.</p>
+
+<p>This project is distributed in three levels.</p>
+
+<p>The class <code>StationServer</code> handles all of the activities of this server and exposes them via RMI so that the <code>OfficerClient</code> class can access its methods. <code>StationServer</code> is instantiated for as many police stations as needed (in this case 3).</p>
+
+<p>The <code>StationServer</code> class communicates with other stations via UDP to other stations via a simple request serialization scheme. The requests and the responses are just key value string pairs. The request consists of a request and a response. Responses are handled in their own thread. The UDP port is based on a preagreed hashing function of the station name so other stations can be added as needed.</p>
+
+<p>There are a minimum two running processes with several threads.</p>
+
+<p>One process for the RMI servers each with a thread for each station. Each station forks an additional thread for its UDP server for inter-station requests.</p>
+
+<p>The <code>StationServer</code> class is instantiated for each server, this class then creates a thread to listen to UDP requests.</p>
+
+<p>Records are stored as <code>Record</code> objects which is extended into <code>CriminalRecord</code> objects for criminal records and <code>MissingRecord</code> objects for missing person records.</p>
+
+<p><code>RecordContainer</code> contains all <code>Record</code>s in a protected field called records. records is an array containin 26 <code>HashMap</code>s of <code>Record</code>s keyed on <code>String</code>s which are the IDs of the records.</p>
+
+<p>When records are added (or potentially removed) the corresponding map for that record is locked with Java's <code>synchronized</code> mechanism. Similarly, this is used to lock the whole records array when making the count of records on a particular server.</p>
+
+<p>When we are reading or modifying records, we lock them on the specific <code>Record</code> with <code>synchronized</code> so it is in a consistent state.</p>
+
+<p><code>StationServer</code> implements the <code>StationInterface</code> for RMI. <code>StationInterface</code> extends Java's RMI <code>Remote</code> Interface so that it may be exported via RMI to officers or clients in <code>OfficerClient</code></p>
+
+<h3>Web Service</h3>
+
+<p>The Web Service aspect of the application is exposed through a WSDL file (<code>WebServiceAdapter.wsdl</code>) which works as a lookup for the client to make SOAP requests. SOAP requests are just XML documents used as request response pairs which are sent over HTTP.</p>
+
+<p><code>WebServiceAdapter</code> is an adapter class the adapts SOAP calls into RMI calls by instatiating an RMI Client for each request where a new object is created.</p>
+
+<p>Because of the nature of the Java Web Service, objects on the server side are not persisted, but rather instantiated on demand. For this reason, RMI was used on the server side to make requests to the <code>StationServer</code> class so that it would persist for the duration of the application.</p>

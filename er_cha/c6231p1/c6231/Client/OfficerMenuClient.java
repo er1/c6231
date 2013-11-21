@@ -4,28 +4,15 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Scanner;
 
-/**
- *
- * @author chanman
- */
 public class OfficerMenuClient {
 
     static Scanner in;
 
-    /**
-     *
-     * @param query
-     * @return
-     */
     protected static String ask(String query) {
         System.out.print(query);
         return in.nextLine();
     }
 
-    /**
-     *
-     * @param args
-     */
     public static void main(String[] args) {
 
         String officerId = "SPVM7851";
@@ -56,7 +43,7 @@ public class OfficerMenuClient {
             try {
                 String responseLine = in.nextLine();
                 response = Integer.parseInt(responseLine.trim());
-            } catch (Exception ex) {
+            } catch (NumberFormatException ex) {
                 response = -1;
             }
 

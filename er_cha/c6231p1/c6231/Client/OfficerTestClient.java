@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
-/**
- *
- * @author chanman
- */
 public class OfficerTestClient {
 
     static class StationTest extends Thread {
@@ -59,7 +55,7 @@ public class OfficerTestClient {
      */
     public static void main(String[] args) {
 
-            // Create THREADS clients producing RECS_PER_THREAD records each
+        // Create THREADS clients producing RECS_PER_THREAD records each
         final String[] stations = {"SPVM", "SPL", "SPB"};
 
         ArrayList<Thread> threads = new ArrayList<Thread>();

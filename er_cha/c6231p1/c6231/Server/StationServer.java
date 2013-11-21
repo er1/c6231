@@ -26,6 +26,7 @@ public class StationServer implements StationInterface {
 
     // Stations to start
     final static String[] stations = {"SPVM", "SPL", "SPB"};
+
     /**
      * Start all of the stations
      *
@@ -150,7 +151,7 @@ public class StationServer implements StationInterface {
 
         // hard coded magic number
         int port = 1447 + Arrays.asList(stations).indexOf(this.name);
-        
+
         StationSkel skel = new StationSkel(log, port, this);
         skel.start();
     }
@@ -218,19 +219,19 @@ public class StationServer implements StationInterface {
                 try (DatagramSocket socket = new DatagramSocket()) {
                     InetAddress addr = InetAddress.getByName("localhost");
                     int port = this.portHash(stationName);
-                    
+
                     DatagramPacket packet = new DatagramPacket(request.getBytes(), request.length(), addr, port);
                     socket.send(packet);
-                    
+
                     byte[] buffer = new byte[1500];
                     packet = new DatagramPacket(buffer, buffer.length);
                     socket.receive(packet);
-                    
+
                     //
                     String response = new String(buffer, 0, packet.getLength());
-                    
+
                     System.out.println(response);
-                    
+
                     if (response.startsWith("recordCount:")) {
                         String count = response.substring(response.indexOf(":") + 1);
                         counts += stationName + ": " + count + ", ";
@@ -325,7 +326,7 @@ public class StationServer implements StationInterface {
 
         if (!Arrays.asList(stations).contains(remoteStationServerName)) {
             log.log("transferRecord -X-> " + remoteStationServerName + " server is not whitelisted");
-            return "_FAIL_";
+            return "";
         }
 
         try {
@@ -333,7 +334,7 @@ public class StationServer implements StationInterface {
 
             if (record == null) {
                 log.log("  transferRecord <FAILED> record not found");
-                return "_NONE_";
+                return "";
             }
 
             Map<String, String> request = RecordFactory.createMapFromRecord(record);
@@ -362,11 +363,11 @@ public class StationServer implements StationInterface {
             if (response.containsKey("id")) {
                 return response.get("id"); // return new id
             }
-            return "_NONE_";
+            return "";
 
         } catch (IOException ex) {
             log.log("  transferRecord <FAILED> connection failed");
-            return "_FAIL_";
+            return "";
         }
     }
 }

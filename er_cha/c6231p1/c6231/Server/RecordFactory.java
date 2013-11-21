@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package c6231.Server;
 
 import java.text.DateFormat;
@@ -11,16 +7,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author chanman
- */
 public class RecordFactory {
 
     public static final DateFormat recordDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static Map<String, String> createMapFromRecord(Record record) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("id", record.getId());
         map.put("fn", record.getFirstName());
         map.put("ln", record.getLastName());
@@ -63,7 +55,7 @@ public class RecordFactory {
         if ("MR".equals(ty)) {
             String ad = map.get("ad");
             String ll = map.get("ll");
-            Date ld = new Date();;
+            Date ld = new Date();
             try {
                 ld = recordDateFormat.parse(map.get("ld"));
             } catch (ParseException ex) {

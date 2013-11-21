@@ -4,10 +4,6 @@ import java.util.HashMap;
 
 import c6231.Log;
 
-/**
- *
- * @author chanman
- */
 public class RecordContainer {
 
     static RecordContainer getRecordContainer(String stationName) {
@@ -15,31 +11,21 @@ public class RecordContainer {
         container.createRecordContainer();
         return container;
     }
-    /**
-     *
-     */
+
     static protected long nextId = 10000;
-    /**
-     *
-     */
+
     static protected final Object idlock = new Object();
-    
+
     final HashMap<String, Record>[] records = new HashMap[26];
 
     final Object recordsLock = new Object();
 
-    /**
-     *
-     * @param record
-     */
     public void addRecord(Record record) {
         String lastName = record.getLastName();
 
         // get the lower five bits representing which letter we are after
         // minus one since letters start at 1
-
         //int entry = (Character.getNumericValue(lastName.charAt(0)) & 0x1f) - 1;
-
         int entry = lastName.toLowerCase().codePointAt(0) - "a".codePointAt(0);
 
         if (entry < 0 || entry >= 26) {
@@ -53,12 +39,9 @@ public class RecordContainer {
         }
     }
 
-    /**
-     *
-     */
     protected void createRecordContainer() {
         for (int i = 0; i < 26; i++) {
-            records[i] = new HashMap<String, Record>();
+            records[i] = new HashMap<>();
         }
     }
 
@@ -72,10 +55,6 @@ public class RecordContainer {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public long getNextFreeId() {
         synchronized (idlock) {
             return nextId++;
@@ -110,12 +89,8 @@ public class RecordContainer {
         return null;
     }
 
-    /**
-     *
-     * @return
-     */
     @SuppressWarnings("rawtypes")
-	public int getRecordCount() {
+    public int getRecordCount() {
         int count = 0;
         synchronized (records) {
             for (HashMap map : records) {
@@ -130,7 +105,6 @@ public class RecordContainer {
         // minus one since letters start at 1
 
         //int entry = (Character.getNumericValue(lastName.charAt(0)) & 0x1f) - 1;
-
         int entry = lastName.toLowerCase().codePointAt(0) - "a".codePointAt(0);
 
         if (entry < 0 || entry >= 26) {

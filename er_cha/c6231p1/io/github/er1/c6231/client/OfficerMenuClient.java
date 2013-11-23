@@ -1,4 +1,4 @@
-package c6231.Client;
+package io.github.er1.c6231.client;
 
 import java.util.Date;
 import java.util.Random;

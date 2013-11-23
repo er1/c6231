@@ -1,4 +1,4 @@
-package c6231.Server;
+package io.github.er1.c6231.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,9 +11,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import c6231.Log;
-import c6231.MapSerializer;
-import c6231.StationInterface;
+import io.github.er1.c6231.Log;
+import io.github.er1.c6231.MapSerializer;
+import io.github.er1.c6231.StationInterface;
+import java.net.InetSocketAddress;
 
 /**
  * Station Server Class
@@ -101,7 +102,7 @@ public class StationServer implements StationInterface {
     public String createMRecord(String firstName, String lastName, String address, long lastDateLong, String lastLocation, String status) {
         log.log("createMRecord (" + firstName + " " + lastName + ": " + address + " " + lastLocation + "@" + Long.toString(lastDateLong) + " [" + status + "])");
 
-        Date lastDate = new Date(lastDateLong * 1000);
+        Date lastDate = new Date(lastDateLong);
         MissingRecord record = new MissingRecord(records.getNextFreeId(), firstName, lastName, address, lastDate, lastLocation, status);
         String id = record.getId();
         records.addRecord(record);
@@ -162,19 +163,22 @@ public class StationServer implements StationInterface {
     protected void exportUDP() {
 
         // create the socket
-        log.log("Attempting to publish UDP for " + this.name);
-
+        
         int recvPort = portHash(name);
+        
+        log.log("Attempting to publish UDP for " + this.name + " on " + recvPort);
+
         DatagramSocket socket;
         try {
-            socket = new DatagramSocket(recvPort);
+            socket = new DatagramSocket(null);
+            socket.setReuseAddress(true);
+            socket.bind(new InetSocketAddress(recvPort));
         } catch (SocketException ex) {
-            log.log(ex.toString() + " " + ex.getMessage());
-            log.log("UDP server could not be started, UDP will be unavailable");
+            log.log("Interstation server could not be started. reason: " + ex.toString());
             return;
         }
 
-        log.log("Published UDP for " + name + " on " + portHash(name));
+        log.log("Published UDP for " + name + " on " + recvPort);
 
         // wait for packets
         byte[] buffer = new byte[1500];

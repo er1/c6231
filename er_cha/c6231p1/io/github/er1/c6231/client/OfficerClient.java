@@ -1,9 +1,9 @@
-package c6231.Client;
+package io.github.er1.c6231.client;
 
 import java.util.Date;
 
-import c6231.Log;
-import c6231.StationInterface;
+import io.github.er1.c6231.Log;
+import io.github.er1.c6231.StationInterface;
 
 /**
  * Officer Class to act against the RMI server logging events as they occur
@@ -59,7 +59,7 @@ public class OfficerClient {
         }
         String retval;
         log.log("createMRecord (" + firstName + " " + lastName + ": " + address + " " + lastLocation + "@" + lastDate.toString() + " [" + status + "])");
-        retval = instance.createMRecord(firstName, lastName, address, lastDate.getTime() / 1000, lastLocation, status);
+        retval = instance.createMRecord(firstName, lastName, address, lastDate.getTime(), lastLocation, status);
         log.log("  createMRecord <OK> " + retval);
         return retval;
     }

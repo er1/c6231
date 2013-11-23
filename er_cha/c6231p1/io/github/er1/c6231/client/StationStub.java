@@ -1,6 +1,6 @@
-package c6231.Client;
+package io.github.er1.c6231.client;
 
-import c6231.StationInterface;
+import io.github.er1.c6231.StationInterface;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;

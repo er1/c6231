@@ -1,4 +1,4 @@
-package c6231;
+package io.github.er1.c6231;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

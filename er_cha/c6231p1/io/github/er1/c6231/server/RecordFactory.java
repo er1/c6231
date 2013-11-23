@@ -1,15 +1,10 @@
-package c6231.Server;
+package io.github.er1.c6231.server;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RecordFactory {
-
-    public static final DateFormat recordDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static Map<String, String> createMapFromRecord(Record record) {
         Map<String, String> map = new HashMap<>();
@@ -29,7 +24,7 @@ public class RecordFactory {
             MissingRecord mr = (MissingRecord) record;
             map.put("ad", mr.getAddress());
             map.put("ll", mr.getLastLocation());
-            map.put("ld", recordDateFormat.format(mr.getLastDate()));
+            map.put("ld", Long.toString(mr.getLastDate().getTime()));
         } catch (ClassCastException ex) {
         }
 
@@ -55,11 +50,7 @@ public class RecordFactory {
         if ("MR".equals(ty)) {
             String ad = map.get("ad");
             String ll = map.get("ll");
-            Date ld = new Date();
-            try {
-                ld = recordDateFormat.parse(map.get("ld"));
-            } catch (ParseException ex) {
-            }
+            Date ld = new Date(Long.parseLong(map.get("ld")));
             return new MissingRecord(idnum, fn, ln, ad, ld, ll, st);
         }
         return null;

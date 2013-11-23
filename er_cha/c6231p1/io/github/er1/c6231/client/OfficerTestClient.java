@@ -1,4 +1,4 @@
-package c6231.Client;
+package io.github.er1.c6231.client;
 
 import java.util.ArrayList;
 import java.util.Date;

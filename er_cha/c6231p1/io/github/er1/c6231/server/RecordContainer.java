@@ -1,8 +1,8 @@
-package c6231.Server;
+package io.github.er1.c6231.server;
 
 import java.util.HashMap;
 
-import c6231.Log;
+import io.github.er1.c6231.Log;
 
 public class RecordContainer {
 

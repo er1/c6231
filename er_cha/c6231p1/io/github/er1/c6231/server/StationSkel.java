@@ -1,11 +1,12 @@
-package c6231.Server;
+package io.github.er1.c6231.server;
 
-import c6231.Log;
-import c6231.StationInterface;
+import io.github.er1.c6231.Log;
+import io.github.er1.c6231.StationInterface;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 public class StationSkel {
@@ -27,10 +28,11 @@ public class StationSkel {
         int recvPort = port;
         DatagramSocket socket;
         try {
-            socket = new DatagramSocket(recvPort);
+            socket = new DatagramSocket(null);
+            socket.setReuseAddress(true);
+            socket.bind(new InetSocketAddress(recvPort));
         } catch (SocketException ex) {
-            log.log(ex.toString() + " " + ex.getMessage());
-            log.log("UDP server could not be started, UDP will be unavailable");
+            log.log("RPC server could not be started. reason: " + ex.toString());
             return;
         }
 
@@ -53,7 +55,7 @@ public class StationSkel {
                 socket.send(sendPacket);
 
             } catch (IOException ex) {
-                log.log(ex.toString() + " " + ex.getMessage());
+                log.log("Skel: " + ex.toString());
             }
         }
     }

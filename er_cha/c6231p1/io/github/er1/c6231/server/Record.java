@@ -1,4 +1,4 @@
-package c6231.Server;
+package io.github.er1.c6231.server;
 
 public abstract class Record {
 

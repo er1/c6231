@@ -8,7 +8,7 @@ public class Booter {
     public static void main(String[] args) {
         System.out.println("Hello, Booter!");
         Object o = new Object();
-
+        
         Process process;
 
         synchronized (o) {

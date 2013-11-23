@@ -53,7 +53,7 @@ public class ReplicationDaemon {
                     }
 
                     System.err.println("[Replicator] instance starting...");
-                   F process = boot(SERVERCLASS);
+                    process = boot(SERVERCLASS);
 
                     InetAddress sendAddr = packet.getAddress();
                     int sendPort = packet.getPort();

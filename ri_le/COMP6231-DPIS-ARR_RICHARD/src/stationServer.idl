@@ -1,0 +1,23 @@
+module stationServerIDL {
+
+	//structure for my assignment2
+	struct Upcasted_Record{
+		string RecordID;
+		string lastName;
+		string firstName;
+		string status;
+		string description;
+		string address;
+		long long lastDate;
+		string lastLocation;
+	};
+
+	interface StationInterface{
+	
+		//needed for my assignment 2
+		string transfer(in Upcasted_Record theRecord);
+
+		
+	}; //StationInterface
+
+}; //module stationServerIDL

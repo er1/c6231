@@ -4,17 +4,15 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import io.github.er1.c6231.Log;
 import io.github.er1.c6231.MapSerializer;
 import io.github.er1.c6231.StationInterface;
-import java.net.InetSocketAddress;
 
 /**
  * Station Server Class
@@ -26,7 +24,7 @@ import java.net.InetSocketAddress;
 public class StationServer implements StationInterface {
 
     // Stations to start
-    final static String[] stations = {"SPVM", "SPL", "SPB"};
+    final static String[] stations = {"SPVM", "SPB", "SPL"};
 
     /**
      * Start all of the stations
@@ -163,9 +161,8 @@ public class StationServer implements StationInterface {
     protected void exportUDP() {
 
         // create the socket
-        
         int recvPort = portHash(name);
-        
+
         log.log("Attempting to publish UDP for " + this.name + " on " + recvPort);
 
         DatagramSocket socket;
@@ -238,23 +235,15 @@ public class StationServer implements StationInterface {
 
                     if (response.startsWith("recordCount:")) {
                         String count = response.substring(response.indexOf(":") + 1);
-                        counts += stationName + ": " + count + ", ";
+                        counts += stationName + ":" + count + ";";
                     } else {
-                        counts += stationName + " responded badly, ";
+                        counts += stationName + ":-1;";
                     }
                 }
-
-            } catch (SocketException ex) {
-                throw new RuntimeException(ex);
-            } catch (UnknownHostException ex) {
-                throw new RuntimeException(ex);
             } catch (IOException ex) {
-                // station unavailible
                 throw new RuntimeException(ex);
             }
-
         }
-
         return counts;
     }
 
@@ -288,7 +277,7 @@ public class StationServer implements StationInterface {
             return response;
         }
 
-        response.put("error", "invalidAct^ion");
+        response.put("error", "invalidAction");
         return response;
     }
 

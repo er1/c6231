@@ -13,6 +13,7 @@ import java.util.Map;
 import io.github.er1.c6231.Log;
 import io.github.er1.c6231.MapSerializer;
 import io.github.er1.c6231.StationInterface;
+import java.util.ArrayList;
 
 /**
  * Station Server Class
@@ -36,11 +37,24 @@ public class StationServer implements StationInterface {
         Log serverlog = new Log("ServerMain");
         serverlog.log("Started...");
 
+        ArrayList<Thread> threads = new ArrayList<>();
+
         // Start a thread of each station
         for (String stationName : stations) {
             StationServer station = new StationServer(stationName);
+            threads.add(new Thread(station.RPCrunner()));
+            threads.add(new Thread(station.UDPrunner()));
+        }
 
-            station.startServerThreads();
+        for (Thread t : threads) {
+            t.start();
+        }
+        for (Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException ex) {
+                serverlog.log("Thread did not join");
+            }
         }
     }
     // Station specific variables
@@ -139,6 +153,24 @@ public class StationServer implements StationInterface {
         }
 
         return id;
+    }
+
+    public Runnable RPCrunner() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                exportRPC();
+            }
+        };
+    }
+
+    public Runnable UDPrunner() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                exportUDP();
+            }
+        };
     }
 
     /**
@@ -299,25 +331,8 @@ public class StationServer implements StationInterface {
     }
 
     /**
-     *
-     */
-    public void startServerThreads() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                exportUDP();
-            }
-        }).start();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                exportRPC();
-            }
-        }).start();
-    }
-
-    /**
      * Transfer a record from one station to another
+     *
      * @param badgeID
      * @param recordID
      * @param remoteStationServerName

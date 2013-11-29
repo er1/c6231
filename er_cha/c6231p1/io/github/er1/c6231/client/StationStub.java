@@ -73,9 +73,6 @@ public class StationStub implements StationInterface {
     }
 
     String handoff(String requestString) {
-
-        System.out.println(requestString);
-
         String response;
         try (DatagramSocket socket = new DatagramSocket()) {
 
@@ -98,8 +95,6 @@ public class StationStub implements StationInterface {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-
-        System.out.println(response);
 
         return response;
     }

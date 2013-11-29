@@ -72,11 +72,7 @@ public class StationSkel {
                 ObjectInputStream ois = new ObjectInputStream(bais);
                 String requestString = (String) ois.readObject();
 
-                log.log(requestString);
-                
                 String responseString = handle(requestString);
-                
-                log.log(responseString);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);

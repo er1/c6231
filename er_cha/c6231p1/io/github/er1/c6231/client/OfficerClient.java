@@ -98,7 +98,7 @@ public class OfficerClient {
         switch (station) {
             case "SPVM":
                 return 1447;
-            case "SBL":
+            case "SPB":
                 return 1448;
             case "SPL":
                 return 1449;

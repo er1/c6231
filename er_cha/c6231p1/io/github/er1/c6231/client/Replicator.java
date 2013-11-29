@@ -5,13 +5,27 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * 
+ * @author chanman
+ */
 public class Replicator {
 
+    /**
+     *
+     * @param servicePort
+     * @return
+     */
     protected int getReplicationPort(int servicePort) {
         int replicationPort = (servicePort / 100) + 1537;
         return replicationPort;
     }
 
+    /**
+     *
+     * @param servicePort
+     * @return
+     */
     public boolean RestartServiceFromPort(int servicePort) {
         int replicationPort = getReplicationPort(servicePort);
         try (DatagramSocket socket = new DatagramSocket()) {

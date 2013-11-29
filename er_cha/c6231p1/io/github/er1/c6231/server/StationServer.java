@@ -298,6 +298,9 @@ public class StationServer implements StationInterface {
         return bucket + 1024;
     }
 
+    /**
+     *
+     */
     public void startServerThreads() {
         new Thread(new Runnable() {
             @Override
@@ -313,6 +316,13 @@ public class StationServer implements StationInterface {
         }).start();
     }
 
+    /**
+     * Transfer a record from one station to another
+     * @param badgeID
+     * @param recordID
+     * @param remoteStationServerName
+     * @return
+     */
     @Override
     public String transferRecord(String badgeID, String recordID, String remoteStationServerName) {
         log.log("transferRecord (" + badgeID + " transfers " + recordID + " --> " + remoteStationServerName + ")");

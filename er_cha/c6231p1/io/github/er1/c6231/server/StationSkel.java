@@ -10,7 +10,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 /**
- *
+ * Skeleton Methods for to map methods to UDP packets
  * @author chanman
  */
 public class StationSkel {
@@ -20,10 +20,10 @@ public class StationSkel {
     int port;
 
     /**
-     *
-     * @param log
-     * @param port
-     * @param implementation
+     * Construct based on a log, port to publish on and implementation
+     * @param log object to log against
+     * @param port port to publish methods on
+     * @param implementation implementation of methods
      */
     public StationSkel(Log log, int port, StationInterface implementation) {
         this.log = log;
@@ -32,7 +32,7 @@ public class StationSkel {
     }
 
     /**
-     *
+     * Publish the interface as a synchronous method
      */
     public void start() {
         // create the socket

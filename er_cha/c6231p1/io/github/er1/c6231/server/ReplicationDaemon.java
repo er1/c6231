@@ -7,9 +7,24 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 
+/**
+ * Replication Daemon
+ *
+ * Used as a wrapper for starting another class with it's own main method This
+ * will then kill and restart the process on a given signal form a UDP port
+ *
+ * @author chanman
+ */
 public class ReplicationDaemon {
 
+    /**
+     * This is the class with the static main method to start
+     */
     public static final Class SERVERCLASS = StationServer.class;
+
+    /**
+     * This is the port that will trigger a reboot
+     */
     public static final int DAEMONPORT = 1551;
 
     /*
@@ -26,6 +41,11 @@ public class ReplicationDaemon {
     
      */
     
+    /**
+     * Wrapper main method
+     *
+     * @param args
+     */
     public static void main(String[] args) {
 
         Process process = boot(SERVERCLASS);
@@ -69,6 +89,12 @@ public class ReplicationDaemon {
         }
     }
 
+    /**
+     * start a new process based on the given class
+     *
+     * @param realmain real class to start
+     * @return process object
+     */
     public static Process boot(Class realmain) {
         try {
             ProcessBuilder pb;

@@ -2,7 +2,11 @@ package io.github.er1.c6231.server;
 
 import io.github.er1.c6231.Log;
 import io.github.er1.c6231.StationInterface;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -11,6 +15,7 @@ import java.net.SocketException;
 
 /**
  * Skeleton Methods for to map methods to UDP packets
+ *
  * @author chanman
  */
 public class StationSkel {
@@ -21,6 +26,7 @@ public class StationSkel {
 
     /**
      * Construct based on a log, port to publish on and implementation
+     *
      * @param log object to log against
      * @param port port to publish methods on
      * @param implementation implementation of methods
@@ -60,14 +66,27 @@ public class StationSkel {
 
                 InetAddress sendAddr = recvPacket.getAddress();
                 int sendPort = recvPacket.getPort();
-                String requestString = new String(buffer).substring(0, recvPacket.getLength());
 
+                // dirty java object serialization for compatibility with everyone else
+                ByteArrayInputStream bais = new ByteArrayInputStream(recvPacket.getData());
+                ObjectInputStream ois = new ObjectInputStream(bais);
+                String requestString = (String) ois.readObject();
+
+                log.log(requestString);
+                
                 String responseString = handle(requestString);
+                
+                log.log(responseString);
 
-                DatagramPacket sendPacket = new DatagramPacket(responseString.getBytes(), responseString.length(), sendAddr, sendPort);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(responseString);
+                byte[] response = baos.toByteArray();
+
+                DatagramPacket sendPacket = new DatagramPacket(response, response.length, sendAddr, sendPort);
                 socket.send(sendPacket);
 
-            } catch (IOException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 log.log("Skel: " + ex.toString());
             }
         }
@@ -75,18 +94,18 @@ public class StationSkel {
 
     private String handle(String arglist) {
         String[] args = arglist.split(":");
-        String method = args[0];
+        String method = args[0].toLowerCase(); // lowercase for team compatibility
 
         switch (method) {
-            case "createCRecord":
+            case "createcrecord":
                 return impl.createCRecord(args[1], args[2], args[3], args[4]);
-            case "createMRecord":
+            case "createmrecord":
                 return impl.createMRecord(args[1], args[2], args[3], Long.parseLong(args[4]), args[5], args[6]);
-            case "editCRecord":
+            case "editcrecord":
                 return impl.editCRecord(args[1], args[2], args[3]);
-            case "getRecordCounts":
+            case "getrecordcounts":
                 return impl.getRecordCounts();
-            case "transferRecord":
+            case "transferrecord":
                 return impl.transferRecord(args[1], args[2], args[3]);
             default:
                 throw new UnsupportedOperationException("Not supported yet.");

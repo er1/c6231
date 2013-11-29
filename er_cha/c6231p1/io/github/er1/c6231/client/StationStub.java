@@ -1,6 +1,10 @@
 package io.github.er1.c6231.client;
 
 import io.github.er1.c6231.StationInterface;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -68,19 +72,35 @@ public class StationStub implements StationInterface {
         return handoff(args.toString());
     }
 
-    String handoff(String request) {
+    String handoff(String requestString) {
+
+        System.out.println(requestString);
+
         String response;
         try (DatagramSocket socket = new DatagramSocket()) {
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(requestString);
+            byte[] request = baos.toByteArray();
+
             InetAddress addr = InetAddress.getByName("localhost");
-            DatagramPacket packet = new DatagramPacket(request.getBytes(), request.length(), addr, port);
+            DatagramPacket packet = new DatagramPacket(request, request.length, addr, port);
             socket.send(packet);
             byte[] buffer = new byte[1500];
             packet = new DatagramPacket(buffer, buffer.length);
             socket.receive(packet);
-            response = new String(buffer, 0, packet.getLength());
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(packet.getData());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            response = (String) ois.readObject();
+
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+
+        System.out.println(response);
+
         return response;
     }
 }

@@ -39,7 +39,7 @@ public class OfficerClient {
     public void connect() {
         int port = getPortFromName(station);
         instance = new StationStub(port);
-        this.log.log("Connected!");
+        this.log.log("Connected on port " + port);
     }
 
     String createCRecord(String firstName, String lastName, String description, String status) {
@@ -98,9 +98,9 @@ public class OfficerClient {
         switch (station) {
             case "SPVM":
                 return 1447;
-            case "SPL":
+            case "SBL":
                 return 1448;
-            case "SPB":
+            case "SPL":
                 return 1449;
         }
         return 9999; // Magic number

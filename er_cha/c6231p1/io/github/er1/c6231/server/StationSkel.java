@@ -9,18 +9,31 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 
+/**
+ *
+ * @author chanman
+ */
 public class StationSkel {
 
     Log log;
     StationInterface impl;
     int port;
 
+    /**
+     *
+     * @param log
+     * @param port
+     * @param implementation
+     */
     public StationSkel(Log log, int port, StationInterface implementation) {
         this.log = log;
         this.port = port;
         impl = implementation;
     }
 
+    /**
+     *
+     */
     public void start() {
         // create the socket
         log.log("Attempting to publish UDP");

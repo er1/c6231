@@ -28,7 +28,6 @@ public class UDPServer extends Thread{
 	UDPServer(String stationName, int udpPortNumber){
 		this.udpPortNumber = udpPortNumber;
 		this.stationName = stationName;
-		this.start();
 	}
 	
 	public String getCurrentServerRecordsCount(){

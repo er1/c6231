@@ -2,16 +2,21 @@ package stationSystem;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,7 +62,7 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 	/** 
 	 *  keep track the udpPortNumber of the StationServer object
 	 */
-	private UDPServer udpServer;//internal
+	private UDPServer udpServer = null;//internal
 	private int udpPortNumber;
 	
 	private int recordsCount = 0;
@@ -78,6 +83,8 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 	public static final int SPVM_PORT_NUMBER_external = 1557;
 	public static final int SPL_PORT_NUMBER_external = 1558;
 	public static final int SPB_PORT_NUMBER_external = 1559;
+	
+	private static ArrayList<Thread> THREADS = new ArrayList<Thread>();
 	
 	/**
 	 *  constructor of the ServerStation
@@ -106,6 +113,11 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 		default:
 			System.out.println("Error: the provided UDP port number is not meant for this system's Replica");
 			break;
+		}
+		
+		if(udpServer != null){
+			udpServer.start();
+			THREADS.add(udpServer);
 		}
 		
 		
@@ -659,11 +671,15 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 	public void run(){
 		DatagramSocket aSocket = null;
 		try{
-			aSocket = new DatagramSocket(this.udpPortNumber);
+			//aSocket = new DatagramSocket(this.udpPortNumber);
+			aSocket = new DatagramSocket(null);
+			aSocket.setReuseAddress(true);
+			aSocket.bind(new InetSocketAddress(this.udpPortNumber));
+			
 					
 			byte[] buffer = new byte[1000];
 			
-			String returnOutput, requestString;
+			String returnOutput, requestString = null;
 			while(true){
 				// reset the output for the next request
 				returnOutput = "";
@@ -673,29 +689,37 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 				aSocket.receive(requestPacket);
 				
 				// the request data back into a string
-				requestString = new String(requestPacket.getData(), 0, requestPacket.getLength());
+				//requestString = new String(requestPacket.getData(), 0, requestPacket.getLength());
 				
+				 ByteArrayInputStream in = new ByteArrayInputStream(buffer);
+				 ObjectInputStream is = new ObjectInputStream(in);
+				 try {
+					requestString = (String)is.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				
 				String[] tokens = requestString.split(":");
 				
 				//parse the requestString
-				if(tokens[0].equals("createCRecord")){
+				if(tokens[0].equalsIgnoreCase("createCRecord")){
 					//createCRecord:SPVM1234:John:Doe:Description Here:OnTheRun
 					returnOutput = createCRecord(tokens[1], tokens[2], tokens[3], tokens[4], tokens[5]);
 					
-				}else if(tokens[0].equals("createMRecord")){
+				}else if(tokens[0].equalsIgnoreCase("createMRecord")){
 					//createMRecord:SPL4321:Ellie:Johnson:123 Fake St.:1022780000:Montreal:Missing
 					returnOutput = createMRecord(tokens[1], tokens[2], tokens[3], tokens[4], convertDateString2Long(tokens[5]), tokens[6], tokens[7]);
 					
-				}else if(tokens[0].equals("editCRecord")){
+				}else if(tokens[0].equalsIgnoreCase("editCRecord")){
 					//editCRecord:SPL4545:John:CR10001:OnTheRun
 					returnOutput = editRecord(tokens[1], tokens[2], tokens[3], tokens[4]);
 					
-				}else if(tokens[0].equals("getRecordCount")){
+				}else if(tokens[0].equalsIgnoreCase("getRecordCount")){
 					//getRecordCount:SPMV1111
 					returnOutput = getRecordCounts(tokens[1]);
 					
-				}else if(tokens[0].equals("transferRecord")){
+				}else if(tokens[0].equalsIgnoreCase("transferRecord")){
 					//transferRecord:SPVM7851:CR10000:SPL
 					returnOutput = transferRecord(tokens[1], tokens[2], tokens[3]);
 					
@@ -703,33 +727,54 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 					returnOutput = "";
 				}
 				
+				System.out.println(returnOutput);
 				
 				
 				// turn the resultOutput into an array of bytes for the reply
-				byte [] m = returnOutput.getBytes();
-				DatagramPacket reply = new DatagramPacket(m, returnOutput.length(),
-							requestPacket.getAddress(), requestPacket.getPort());
+				byte [] m = serialize(returnOutput);
+				DatagramPacket reply = new DatagramPacket(m, m.length, requestPacket.getAddress(), requestPacket.getPort());
 				aSocket.send(reply);
 			}
-		}catch(SocketException e){
+		}catch(Exception e){
 			System.out.println("Socket: " + e.getMessage());
-		}catch(IOException e){
-			System.out.println("IO: " + e.getMessage());
-		}finally{
+		} finally{
 			if(aSocket != null)
 				aSocket.close();
 		}
 	}
 
+	public static byte[] serialize(Object obj) throws IOException {
+	    ByteArrayOutputStream out = new ByteArrayOutputStream();
+	    ObjectOutputStream os = new ObjectOutputStream(out);
+	    os.writeObject(obj);
+	    return out.toByteArray();
+	}
+	
+	public static boolean addThread(Thread t){
+		return THREADS.add(t);
+	}
+	
+	public static void killServer(){
+		for(int i = 0; i < THREADS.size(); i++){
+			try{
+				System.out.println("killing " + THREADS.get(i).getName());
+				THREADS.get(i).stop();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		THREADS.clear();
+	}
 	
 	public static void main(String[] args) throws InvalidName, ServantAlreadyActive, WrongPolicy, ObjectNotActive, FileNotFoundException, AdapterInactive {
 
-		ORB orb = ORB.init(args, null);
+		final ORB orb = ORB.init(args, null);
 		POA rootPOA = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
 		
 		ServerStationImpl spvmServerStation = new ServerStationImpl("SPVM", SPVM_PORT_NUMBER_external);
 		Thread t1 = new Thread(spvmServerStation);
 		t1.start();
+		ServerStationImpl.addThread(t1);
 		byte[] id1 = rootPOA.activate_object(spvmServerStation);
 		org.omg.CORBA.Object ref1 = rootPOA.id_to_reference(id1);
 		String ior1 = orb.object_to_string(ref1);
@@ -741,6 +786,7 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 		ServerStationImpl splServerStation = new ServerStationImpl("SPL", SPL_PORT_NUMBER_external);
 		Thread t2 = new Thread(splServerStation);
 		t2.start();
+		ServerStationImpl.addThread(t2);
 		byte[] id2 = rootPOA.activate_object(splServerStation);
 		org.omg.CORBA.Object ref2 = rootPOA.id_to_reference(id2);
 		String ior2 = orb.object_to_string(ref2);
@@ -752,6 +798,7 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 		ServerStationImpl spbServerStation = new ServerStationImpl("SPB", SPB_PORT_NUMBER_external);
 		Thread t3 = new Thread(spbServerStation);
 		t3.start();
+		ServerStationImpl.addThread(t3);
 		byte[] id3 = rootPOA.activate_object(spbServerStation);
 		org.omg.CORBA.Object ref3 = rootPOA.id_to_reference(id3);
 		String ior3 = orb.object_to_string(ref3);
@@ -761,8 +808,15 @@ public class ServerStationImpl extends StationInterfacePOA implements Runnable{
 		file3.close();
 		
 		rootPOA.the_POAManager().activate();
-		orb.run();
+		
+		//need thread to run this in order to add it to the list of thread to be killed if reboot
+		Thread orbThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				orb.run();
+			}
+		});
+		ServerStationImpl.addThread(orbThread);
 		
 	}
-
 }
